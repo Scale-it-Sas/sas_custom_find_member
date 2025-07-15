@@ -1,0 +1,158 @@
+/* Card container styling */
+.contact-card {
+    background-color: #fff;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    width: 100%;
+    /* max-width: 800px; */
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    position: relative;
+}
+.contact-card p {
+font-weight: 600;
+margin-top: 0;
+}
+
+/* Responsive layout for larger screens */
+@media (min-width: 768px) {
+    .contact-card {
+        flex-direction: row; 
+        justify-content: space-between;
+        align-items: flex-start;
+        padding: 1.5rem 2rem;
+        gap: 2rem;
+    }
+}
+
+/* Left section: Name, Address, and Consulting Services */
+.contact-info-left {
+    flex: 2; /* Allows this section to take more space */
+    display: flex;
+    flex-direction: column;
+}
+
+.contact-info-left h3 {
+    font-size: 1.125rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 0.25rem;
+    margin-top: 0;
+}
+
+.contact-info-left p {
+    font-size: 0.875rem;
+    color: #555;
+    line-height: 1.4;
+    margin-bottom: 0.5rem;
+}
+
+.contact-info-left .consulting-services {
+    margin-top: 0.5rem;
+}
+
+.contact-info-left .consulting-services .info-label {
+     margin-bottom: 0.25rem;
+}
+.contact-info-left .consulting-services .info-value {
+    line-height: 1.5;
+}
+
+/* Right section: Phone and Email */
+.contact-info-right {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+@media (min-width: 768px) {
+    .contact-info-right {
+        /* text-align: right; */
+    }
+}
+
+.info-line {
+    font-size: 0.875rem;
+}
+
+@media (min-width: 768px) {
+    .info-line {
+        justify-content: flex-end; /* Push content to the right */
+    }
+}
+
+.info-label {
+    font-weight: bold;
+    color: #333;
+    margin-right: 0.5rem;
+    white-space: nowrap; 
+    display: block;
+    margin-bottom: 0;
+    margin-top: 0;
+}
+
+.info-value {
+    color: #555;
+    flex-grow: 1; /* Allow value to take remaining space */
+}
+
+.info-value.email {
+    color: #8a2be2; /* Purple color for email */
+    text-decoration: none;
+}
+
+/* Buttons section */
+.card-buttons {
+   
+    display: flex;
+    flex-direction: column; /* Stack buttons vertically */
+    gap: 0.5rem;
+}
+
+@media (max-width: 767px) {
+    .card-buttons {
+        position: static; /* Reset position on small screens */
+        margin-top: 1rem; /* Add some space if stacked */
+        align-self: flex-end; /* Push to the right if stacked */
+    }
+}
+
+.action-button {
+    background-color: #8a2be2; /* Purple background */
+    color: #fff;
+    border: none;
+    border-radius: 0.25rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: bold;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: background-color 0.2s ease;
+    min-width: 60px; /* Ensure buttons have a minimum width */
+}
+
+.action-button:hover {
+    background-color: #6a0dad; /* Darker purple on hover */
+}
+
+.action-button svg {
+    margin-right: 0.25rem;
+    width: 0.75rem;
+    height: 0.75rem;
+    fill: currentColor;
+}
+
+/* Specific styling for the PDF button */
+.action-button.pdf-button {
+    background-color: #6c757d; /* Gray for PDF */
+}
+
+.action-button.pdf-button:hover {
+    background-color: #5a6268;
+}

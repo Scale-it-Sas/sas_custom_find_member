@@ -132,7 +132,7 @@ if (!class_exists('SASCustomFindMember')) {
 
             $args = [
                 'post_type'      => 'members',
-                'posts_per_page' => 2,
+                'posts_per_page' => 20,
                 'paged'          => $paged,
             ];
 
@@ -152,6 +152,19 @@ if (!class_exists('SASCustomFindMember')) {
             ob_start();
 
             if ($query->have_posts()) {
+                $foundResult = $query->found_posts;
+                echo '<div class="sas-result-header">';
+                    echo '<div><h3 class="sas-found-result-txt"><strong>Found Result: '. $foundResult .'.</strong></h3></div>';
+
+                    echo '<button class="action-button pdf-button" type="button" onclick="PrintResults()">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd"
+                                    d="M10 3a1 1 0 011 1v5.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 011.414-1.414L9 9.586V4a1 1 0 011-1zM2 15a2 2 0 012-2h12a2 2 0 012 2v2a2 2 0 01-2 2H4a2 2 0 01-2-2v-2z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            PDF
+                        </button>';
+                echo '</div>';
                 echo '<div class="sas-results">';
                 while ($query->have_posts()) {
                     $query->the_post();
@@ -179,10 +192,12 @@ if (!class_exists('SASCustomFindMember')) {
                             <span class="info-label">Phone:</span>
                             <span class="info-value"><?php echo esc_html(get_field('phone')); ?></span>
                         </div>
+                        <?php if(!esc_html(get_field('fax')) == '') { ?>
                         <div class="info-line">
                             <span class="info-label">Fax:</span>
                             <span class="info-value"><?php echo esc_html(get_field('fax')); ?></span>
                         </div>
+                        <?php } ?>
                         <div class="info-line">
                             <span class="info-label">Email:</span>
                             <a href="mailto:<?php echo esc_attr(get_field('email')); ?>" class="info-value email">
@@ -191,7 +206,7 @@ if (!class_exists('SASCustomFindMember')) {
                         </div>
                     </div>
                     <div class="card-buttons">
-                        <a class="action-button pdf-button" href="#" data-member-id="<?php echo get_the_ID(); ?>">
+                        <a class="action-button pdf-button" href="<?php echo esc_html( get_permalink() ); ?>" data-member-id="<?php echo get_the_ID(); ?>">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd"
                                     d="M10 3a1 1 0 011 1v5.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 011.414-1.414L9 9.586V4a1 1 0 011-1zM2 15a2 2 0 012-2h12a2 2 0 012 2v2a2 2 0 01-2 2H4a2 2 0 01-2-2v-2z"
@@ -210,8 +225,8 @@ if (!class_exists('SASCustomFindMember')) {
                 if ($total_pages > 1) {
                     echo '<div class="sas-pagination">';
                     for ($i = 1; $i <= $total_pages; $i++) {
-                        $active_class = ($i === $paged) ? 'bg-blue-500 text-white' : 'bg-white text-blue-500 hover:bg-blue-100';
-                        echo '<a href="#" data-page="' . esc_attr($i) . '" class="px-3 py-1 border rounded ' . $active_class . '">' . esc_html($i) . '</a>';
+                        $active_class = ($i === $paged) ? 'sas-pgn-item-active' : '';
+                        echo '<a href="#" data-page="' . esc_attr($i) . '" class="sas-pgn-item ' . $active_class . '">' . esc_html($i) . '</a>';
                     }
                     echo '</div>';
                 }

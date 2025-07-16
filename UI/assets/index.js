@@ -26,8 +26,8 @@ jQuery(document).ready(function($) {
                     .addClass('select2-selection__choice')
                     .attr('title', optionText)
                     .html(`
-                        <span class="select2-selection__choice__remove" data-value="${value}" role="presentation">×</span>
-                        ${optionText}
+                        <span class="select2-selection__choice__remove" data-value="${value}" role="presentation">× </span>
+                        <span class="sas-consulting-option-val"> ${optionText} </span>
                     `);
                 $li.insertBefore($searchInputField.parent());
             }
@@ -40,15 +40,15 @@ jQuery(document).ready(function($) {
 
         // Adjust input field width
         if (selectedValues.size > 0) {
-            $searchInputField.css('width', 'auto'); // Allow it to shrink
+            $searchInputField.css('width', 'auto');
         } else {
-            $searchInputField.css('width', '100%'); // Take full width if no selections
+            $searchInputField.css('width', '100%');
         }
     };
 
     // Function to render dropdown list
     const renderDropdownList = (filterText = '') => {
-        $customDropdownList.empty(); // Clear existing options
+        $customDropdownList.empty();
         const filteredOptions = optionsData.filter(option =>
             option.text.toLowerCase().includes(filterText.toLowerCase())
         );
@@ -68,15 +68,15 @@ jQuery(document).ready(function($) {
                 .addClass(selectedValues.has(option.value) ? 'selected' : '');
 
             $div.on('click', (e) => {
-                e.stopPropagation(); // Prevent closing dropdown immediately
+                e.stopPropagation();
                 if (selectedValues.has(option.value)) {
                     selectedValues.delete(option.value);
                 } else {
                     selectedValues.add(option.value);
                 }
                 renderSelectedOptions();
-                renderDropdownList($searchInputField.val()); // Re-render to update selected state
-                $searchInputField.focus(); // Keep focus on input after selection
+                renderDropdownList($searchInputField.val());
+                $searchInputField.focus();
             });
             $customDropdownList.append($div);
         });
@@ -90,15 +90,15 @@ jQuery(document).ready(function($) {
             const valueToRemove = $(e.target).attr('data-value');
             selectedValues.delete(valueToRemove);
             renderSelectedOptions();
-            renderDropdownList($searchInputField.val()); // Re-render to update selected state
+            renderDropdownList($searchInputField.val());
             $searchInputField.focus();
-            e.stopPropagation(); // Prevent general click from opening/closing
+            e.stopPropagation(); 
         } else {
             $customDropdownList.toggleClass('hidden');
             if (!$customDropdownList.hasClass('hidden')) {
-                renderDropdownList($searchInputField.val()); // Populate on open
+                renderDropdownList($searchInputField.val());
             }
-            $searchInputField.focus(); // Keep focus on input
+            $searchInputField.focus();
         }
     });
 
@@ -114,7 +114,7 @@ jQuery(document).ready(function($) {
     // Filter options based on search input
     $searchInputField.on('input', (e) => {
         renderDropdownList($searchInputField.val());
-        $customDropdownList.removeClass('hidden'); // Ensure dropdown is visible when typing
+        $customDropdownList.removeClass('hidden');
     });
 
     // Initial render

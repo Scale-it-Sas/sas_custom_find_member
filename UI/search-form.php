@@ -1,4 +1,4 @@
-<form id="sas-search-form">
+<form id="sas-search-form" class="sas-search-form">
     <div class="sas-form-container">
         <!-- Search Section -->
         <div class="search-section">
@@ -174,6 +174,7 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    flex:1;
 }
 
 .info-line {
@@ -257,4 +258,23 @@
 .action-button.pdf-button:hover {
     background-color: #5a6268;
 }
+
+
+@media print{
+    .sas-search-form, 
+    .sas-result-header,
+    .pdf-button,
+    header,
+    footer,
+    #sidebar,
+    .entry-title.main_title
+    {
+        display: none;
+    }
+}
 </style>
+<script>
+    const PrintResults = () => {
+        window.print();
+    }
+</script>

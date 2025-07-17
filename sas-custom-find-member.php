@@ -4,7 +4,7 @@
 Plugin Name: SAS Custom Find Member
 Plugin URI:  https://sitesatscale.com/
 Description: 
-Version:     1.0
+Version:     1.0.0
 Author:      Kieren - SAS Server Engineer
 */
 
@@ -21,10 +21,38 @@ if (!class_exists('SASCustomFindMember')) {
             add_action('wp_enqueue_scripts', [$this, 'load_styles']);
             add_action('wp_enqueue_scripts', [$this, 'load_scripts']);
             add_shortcode('display_find_member_form', [$this, 'display_form']);
+            // Admin UI
+            add_action('admin_enqueue_scripts', [$this, 'load_admin_styles']);
+            add_action('admin_menu', [$this, 'add_admin_menu_page']);
             // Ajax
             add_action('wp_enqueue_scripts', [$this, 'sas_ajax_obj']);
             add_action('wp_ajax_sas_find_member', [$this, 'sas_handle_member_search']);
             add_action('wp_ajax_nopriv_sas_find_member', [$this, 'sas_handle_member_search']);
+        }
+        public function add_admin_menu_page () {
+            add_menu_page(
+                'SAS Find Member',
+                'SAS Find Member', 
+                'manage_options',                     
+                'sas-find-member',
+                null,
+                'dashicons-universal-access-alt',
+                60                                   
+            );
+
+            add_submenu_page(
+                'sas-find-member',
+                'SAS Find Member Settings', 
+                'SAS Find Member Settings', 
+                'manage_options', 
+                'sas-find-member', 
+                [$this, 'display_settings']  
+            );
+        }
+        public function display_settings(){
+            ob_start();
+            $this->load_ui('settings');
+            echo ob_get_clean();
         }
         public function display_form()
         {
@@ -39,8 +67,15 @@ if (!class_exists('SASCustomFindMember')) {
                     'sas-custom-css',
                     plugin_dir_url(__FILE__) . 'UI/assets/style.css'
                 );
-                wp_enqueue_style('sas-custom-style', plugin_dir_url(__FILE__) . 'UI/assets/style.css');
             }
+        }
+        public function load_admin_styles() {
+            wp_enqueue_style(
+                'sas-find-member-settings-style',
+                plugin_dir_url(__FILE__) . 'UI/assets/settings.css',
+                [],
+                '1.0.0'
+            );
         }
 
         public function load_scripts()

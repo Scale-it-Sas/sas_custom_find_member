@@ -7,7 +7,6 @@ A custom feature allows you to search post types using custom fields and categor
 
 - [Installation](#installation)
 - [Usage](#usage)
-- [Configuration](#configuration)
 - [Features](#features)
 - [Compatibility](#compatibility)
 - [Changelog](#changelog)
@@ -20,7 +19,7 @@ A custom feature allows you to search post types using custom fields and categor
 ### Standard WordPress Installation
 
 1.  **Manual Upload (for .zip file):**
-    * Download the plugin's `.zip` file from the [GitHub Releases page](https://github.com/your-username/your-repo/releases).
+    * Download the plugin's `.zip` file from the [GitHub Releases page](https://github.com/sitesatscale/sas_custom_find_member/releases).
     * In your WordPress admin, go to **Plugins > Add New**.
     * Click the "Upload Plugin" button at the top.
     * Choose the downloaded `.zip` file and click "Install Now."
@@ -30,16 +29,16 @@ A custom feature allows you to search post types using custom fields and categor
     * Unzip the plugin file on your computer.
     * Connect to your WordPress site via FTP/SFTP client.
     * Navigate to the `/wp-content/plugins/` directory.
-    * Upload the entire `my-custom-search-plugin` (or your plugin folder name) folder into this directory.
+    * Upload the entire `sas_custom_find_member` folder into this directory.
     * Log in to your WordPress admin, go to **Plugins**, and activate "My Custom Search Plugin."
 
 ---
 
-## Usage & Configuration
+## Usage
 
 **Basic Usage:**
 
-1. Install CPT UI and ACF plugins.
+1. Install **CPT UI** and **ACF plugins**.
 
 2. Create a Custom post type make sure the slug is **'members'**
 
@@ -82,4 +81,4 @@ Paste this on your pages, posts or custom post types.
 
 ## License
 
-© [Year] SAS Server Engineer. All rights reserved.
+© 2025 SAS Server Engineer. All rights reserved.

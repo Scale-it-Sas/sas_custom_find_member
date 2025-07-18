@@ -9,7 +9,7 @@ A custom feature allows you to search post types using custom fields and categor
 - [Installation](#installation)
 - [Usage](#usage)
 - [Features](#features)
-- [Maintenance & Contributions](#maintenance)
+- [Maintenance](#maintenance)
 - [Compatibility](#compatibility)
 - [Changelog](#changelog)
 - [License](#license)
@@ -65,7 +65,9 @@ Paste this on your pages, posts or custom post types.
 
 ---
 
-## Maintenance & Contributions
+## Maintenance
+
+### Contributions
 
 To contribute to this plugin, follow these steps:
 

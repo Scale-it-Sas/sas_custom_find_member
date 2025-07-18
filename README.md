@@ -99,11 +99,16 @@ To contribute to this plugin, follow these steps:
 
 ## Changelog
 
-**1.0.0 - 2025-07-01**
+**1.0.0 - 2025-07-17**
 
 - Initial Release
 - Introduced custom field and category search functionality.
 - Added `[display_find_member_form]` shortcode and Custom Search Widget.
+
+**1.0.0 - 2025-07-18**
+
+- Added additional info in plugin
+
 
 ---
 

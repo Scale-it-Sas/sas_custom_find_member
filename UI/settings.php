@@ -1,6 +1,7 @@
 <div class="wrap">
-    <h1>Copy this shortcode</h1>
+    <h1><strong>Settings</strong></h1>
     <div class="sas-admin-container">
+        <h4>Copy this shortcode</h4>
         <div class="shortcode-container">
             <input
                 class="sas-copy-shortcode"

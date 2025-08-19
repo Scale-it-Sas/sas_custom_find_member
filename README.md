@@ -101,15 +101,21 @@ To contribute to this plugin, follow these steps:
 
 ## Changelog
 
+**1.0.2 - 2025-08-19**
+
+- Modified search functionality to display all members when no search criteria are selected
+- Removed validation requirement for at least one search criterion
+- Improved user experience by allowing empty searches to show complete member directory
+
+**1.0.0 - 2025-07-18**
+
+- Added additional info in plugin
+
 **1.0.0 - 2025-07-17**
 
 - Initial Release
 - Introduced custom field and category search functionality.
 - Added `[display_find_member_form]` shortcode and Custom Search Widget.
-
-**1.0.0 - 2025-07-18**
-
-- Added additional info in plugin
 
 
 ---

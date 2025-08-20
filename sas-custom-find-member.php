@@ -4,7 +4,7 @@
 Plugin Name: SAS Custom Find Member
 Plugin URI:  https://github.com/Scale-it-Sas/sas_custom_find_member#sas-find-member-plugin-for-wordpress
 Description: A custom feature allows you to search post types using custom fields and categories.
-Version:     1.0.2
+Version:     2.0.0
 Author:      Kieren - SAS Server Engineer
 */
 

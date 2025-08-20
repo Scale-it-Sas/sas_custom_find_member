@@ -69,12 +69,17 @@ if (!class_exists('SASCustomFindMember')) {
                 );
             }
         }
-        public function load_admin_styles() {
+        public function load_admin_styles($hook) {
+            // Only load on our plugin's admin page
+            if ($hook !== 'toplevel_page_sas-find-member') {
+                return;
+            }
+            
             wp_enqueue_style(
                 'sas-find-member-settings-style',
                 plugin_dir_url(__FILE__) . 'UI/assets/settings.css',
                 [],
-                '1.0.0'
+                filemtime(plugin_dir_path(__FILE__) . 'UI/assets/settings.css')
             );
         }
 
@@ -111,6 +116,57 @@ if (!class_exists('SASCustomFindMember')) {
             }
         }
 
+        public function get_acf_fields_for_post_type($post_type = 'members') 
+        {
+            $acf_fields = [];
+            if (function_exists('acf_get_field_groups')) {
+                $field_groups = acf_get_field_groups(['post_type' => $post_type]);
+                foreach ($field_groups as $group) {
+                    $fields = acf_get_fields($group['key']);
+                    if ($fields) {
+                        foreach ($fields as $field) {
+                            $acf_fields[$field['name']] = [
+                                'label' => $field['label'],
+                                'type' => $field['type'],
+                                'key' => $field['key']
+                            ];
+                        }
+                    }
+                }
+            }
+            return $acf_fields;
+        }
+
+        public function get_field_mappings() 
+        {
+            return get_option('sas_acf_field_mappings', []);
+        }
+
+        public function is_acf_active() 
+        {
+            return function_exists('acf_get_field_groups');
+        }
+
+        public function validate_field_mapping($field_name, $config) 
+        {
+            if (!is_array($config)) {
+                return false;
+            }
+            
+            $required_keys = ['label', 'show_in_results', 'searchable', 'position'];
+            foreach ($required_keys as $key) {
+                if (!isset($config[$key])) {
+                    return false;
+                }
+            }
+            
+            if (!in_array($config['position'], ['left', 'right'])) {
+                return false;
+            }
+            
+            return true;
+        }
+
 
         function sas_handle_member_search()
         {
@@ -123,9 +179,35 @@ if (!class_exists('SASCustomFindMember')) {
 
             $meta_query = [];
             $tax_query = [];
-
             $meta_conditions = [];
 
+            // Get field mappings
+            $field_mappings = get_option('sas_acf_field_mappings', []);
+
+            // Build meta conditions dynamically based on field mappings
+            foreach ($field_mappings as $field_name => $field_config) {
+                if (!empty($field_config['searchable']) && !empty($keyword[$field_name])) {
+                    $search_value = sanitize_text_field($keyword[$field_name]);
+                    
+                    // For repeater fields and multiple values, we need to search in serialized data
+                    // This handles ACF repeater fields, multiple select fields, etc.
+                    $meta_conditions[] = [
+                        'relation' => 'OR',
+                        [
+                            'key' => $field_name,
+                            'value' => $search_value,
+                            'compare' => 'LIKE',
+                        ],
+                        [
+                            'key' => $field_name . '_%',
+                            'value' => $search_value,
+                            'compare' => 'LIKE',
+                        ]
+                    ];
+                }
+            }
+
+            // Handle hardcoded default fields (company, first_name, surname)
             if (!empty($keyword['company'])) {
                 $meta_conditions[] = [
                     'key' => 'company',
@@ -148,8 +230,13 @@ if (!class_exists('SASCustomFindMember')) {
                 ];
             }
 
+            // Build the final meta query
             if (!empty($meta_conditions)) {
-                $meta_query = array_merge(['relation' => 'OR'], $meta_conditions);
+                if (count($meta_conditions) > 1) {
+                    $meta_query = array_merge(['relation' => 'AND'], $meta_conditions);
+                } else {
+                    $meta_query = $meta_conditions;
+                }
             }
 
             if (!empty($keyword['services']) && is_array($keyword['services'])) {
@@ -207,38 +294,150 @@ if (!class_exists('SASCustomFindMember')) {
                     // Get dynamic consulting services
                     $services = get_the_terms(get_the_ID(), 'category');
                     $services_list = '';
+                    $show_consulting_services = false;
+                    
                     if ($services && !is_wp_error($services)) {
-                        $services_names = wp_list_pluck($services, 'name');
-                        $services_list = implode(', ', $services_names);
+                        // Filter out 'Uncategorized' category
+                        $filtered_services = array_filter($services, function($service) {
+                            return strtolower($service->name) !== 'uncategorized';
+                        });
+                        
+                        if (!empty($filtered_services)) {
+                            $services_names = wp_list_pluck($filtered_services, 'name');
+                            $services_list = implode(', ', $services_names);
+                            $show_consulting_services = true;
+                        }
                     }
                 ?>
                 <div class="member-result contact-card">
                     <div class="contact-info-left">
                         <h3><?php the_title(); ?></h3>
-                        <p><?php echo esc_html(get_field('company')); ?></p>
-                        <p><?php echo esc_html(get_field('location')); ?></p>
+                        <?php 
+                        // Get field mappings
+                        $field_mappings = get_option('sas_acf_field_mappings', []);
+                        
+                        // Display mapped fields in left column
+                        foreach ($field_mappings as $field_name => $field_config) {
+                            if (!empty($field_config['show_in_results']) && $field_config['position'] === 'left') {
+                                $field_value = get_field($field_name);
+                                if (!empty($field_value)) {
+                                    // Handle different field types
+                                    if (is_array($field_value)) {
+                                        // Handle repeater fields or multiple values
+                                        $display_values = [];
+                                        foreach ($field_value as $value) {
+                                            if (is_array($value)) {
+                                                // For repeater fields, extract sub-field values
+                                                $sub_values = array_filter($value, function($v) { return !empty($v); });
+                                                if (!empty($sub_values)) {
+                                                    $display_values[] = implode(' - ', $sub_values);
+                                                }
+                                            } else {
+                                                $display_values[] = $value;
+                                            }
+                                        }
+                                        $display_value = implode(', ', $display_values);
+                                    } else {
+                                        $display_value = $field_value;
+                                    }
+                                    
+                                    if (!empty($display_value)) {
+                                        echo '<p>' . esc_html($display_value) . '</p>';
+                                    }
+                                }
+                            }
+                        }
+                        
+                        // Fallback display for default fields not in mappings
+                        if (!isset($field_mappings['company'])) {
+                            echo '<p>' . esc_html(get_field('company')) . '</p>';
+                        }
+                        if (!isset($field_mappings['location'])) {
+                            echo '<p>' . esc_html(get_field('location')) . '</p>';
+                        }
+                        ?>
+                        <?php if ($show_consulting_services): ?>
                         <div class="info-line consulting-services">
                             <p class="info-label">Consulting Services:</p>
                             <span class="info-value"><?php echo esc_html($services_list); ?></span>
                         </div>
+                        <?php endif; ?>
                     </div>
                     <div class="contact-info-right">
-                        <div class="info-line">
-                            <span class="info-label">Phone:</span>
-                            <span class="info-value"><?php echo esc_html(get_field('phone')); ?></span>
-                        </div>
-                        <?php if(!esc_html(get_field('fax')) == '') { ?>
-                        <div class="info-line">
-                            <span class="info-label">Fax:</span>
-                            <span class="info-value"><?php echo esc_html(get_field('fax')); ?></span>
-                        </div>
-                        <?php } ?>
-                        <div class="info-line">
-                            <span class="info-label">Email:</span>
-                            <a href="mailto:<?php echo esc_attr(get_field('email')); ?>" class="info-value email">
-                                <?php echo esc_html(get_field('email')); ?>
-                            </a>
-                        </div>
+                        <?php
+                        // Display mapped fields in right column
+                        foreach ($field_mappings as $field_name => $field_config) {
+                            if (!empty($field_config['show_in_results']) && $field_config['position'] === 'right') {
+                                $field_value = get_field($field_name);
+                                if (!empty($field_value)) {
+                                    $label = esc_html($field_config['label']);
+                                    
+                                    // Handle different field types
+                                    if (is_array($field_value)) {
+                                        // Handle repeater fields or multiple values
+                                        $display_values = [];
+                                        foreach ($field_value as $value) {
+                                            if (is_array($value)) {
+                                                // For repeater fields, extract sub-field values
+                                                $sub_values = array_filter($value, function($v) { return !empty($v); });
+                                                if (!empty($sub_values)) {
+                                                    $display_values[] = implode(' - ', $sub_values);
+                                                }
+                                            } else {
+                                                $display_values[] = $value;
+                                            }
+                                        }
+                                        $display_value = implode(', ', $display_values);
+                                    } else {
+                                        $display_value = $field_value;
+                                    }
+                                    
+                                    if (!empty($display_value)) {
+                                        echo '<div class="info-line">';
+                                        echo '<span class="info-label">' . $label . ':</span>';
+                                        
+                                        // Special handling for email fields (could be multiple)
+                                        if (strpos(strtolower($field_name), 'email') !== false || strpos(strtolower($label), 'email') !== false) {
+                                            $emails = is_array($field_value) ? $field_value : [$field_value];
+                                            $email_links = [];
+                                            foreach ($emails as $email) {
+                                                if (!empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                                                    $email_links[] = '<a href="mailto:' . esc_attr($email) . '" class="info-value email">' . esc_html($email) . '</a>';
+                                                }
+                                            }
+                                            echo implode(', ', $email_links);
+                                        } else {
+                                            echo '<span class="info-value">' . esc_html($display_value) . '</span>';
+                                        }
+                                        echo '</div>';
+                                    }
+                                }
+                            }
+                        }
+                        
+                        // Fallback display for default fields not in mappings
+                        if (!isset($field_mappings['phone'])) {
+                            echo '<div class="info-line">';
+                            echo '<span class="info-label">Phone:</span>';
+                            echo '<span class="info-value">' . esc_html(get_field('phone')) . '</span>';
+                            echo '</div>';
+                        }
+                        if (!isset($field_mappings['fax'])) {
+                            $fax_value = get_field('fax');
+                            if (!empty($fax_value)) {
+                                echo '<div class="info-line">';
+                                echo '<span class="info-label">Fax:</span>';
+                                echo '<span class="info-value">' . esc_html($fax_value) . '</span>';
+                                echo '</div>';
+                            }
+                        }
+                        if (!isset($field_mappings['email'])) {
+                            echo '<div class="info-line">';
+                            echo '<span class="info-label">Email:</span>';
+                            echo '<a href="mailto:' . esc_attr(get_field('email')) . '" class="info-value email">' . esc_html(get_field('email')) . '</a>';
+                            echo '</div>';
+                        }
+                        ?>
                     </div>
                     <div class="card-buttons">
                         <a class="action-button pdf-button" href="<?php echo esc_html( get_permalink() ); ?>" data-member-id="<?php echo get_the_ID(); ?>">

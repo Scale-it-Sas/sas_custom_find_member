@@ -4,6 +4,7 @@
         <div class="search-section">
             <h2 class="section-title">Search for</h2>
             <div class="sas-grid-container">
+                <!-- Default hardcoded fields -->
                 <div class="sas-form-group">
                     <label for="companyName" class="form-label">Company Name</label>
                     <input type="text" id="companyName" name="companyName" class="sas-form-input"
@@ -18,6 +19,31 @@
                     <label for="surname" class="form-label">Surname</label>
                     <input type="text" id="surname" name="surname" class="sas-form-input" placeholder="Surname" />
                 </div>
+                
+                <!-- Dynamic ACF searchable fields -->
+                <?php 
+                $field_mappings = get_option('sas_acf_field_mappings', []);
+                
+                // Exclude default fields that are already shown above
+                $default_fields = ['company', 'firstname', 'surname'];
+                
+                foreach ($field_mappings as $field_name => $field_config) {
+                    if (!empty($field_config['searchable']) && !in_array($field_name, $default_fields)) {
+                        $field_label = esc_html($field_config['label']);
+                        $field_id = 'acf_' . esc_attr($field_name);
+                        ?>
+                        <div class="sas-form-group">
+                            <label for="<?php echo $field_id; ?>" class="form-label"><?php echo $field_label; ?></label>
+                            <input type="text" 
+                                   id="<?php echo $field_id; ?>" 
+                                   name="<?php echo esc_attr($field_name); ?>" 
+                                   class="sas-form-input"
+                                   placeholder="<?php echo $field_label; ?>" />
+                        </div>
+                        <?php
+                    }
+                }
+                ?>
             </div>
         </div>
 
@@ -25,39 +51,51 @@
         <div>
             <h2 class="section-title">Consulting Services Offered (select all that apply)</h2>
             <div class="select-wrapper">
-                <!-- We could have dynamically loaded the categories here, but I chose to manually add these for security and optimal purposes. -->
                 <select name="filter[5510]" id="consultingServices" class="select2-offscreen" multiple="multiple"
                     placeholder="Click to view/search list" tabindex="-1">
-                    <option value="Accounting & Controls">Accounting & Controls</option>
-                    <option value="Architectural Design">Architectural Design</option>
-                    <option value="Business Strategy">Business Strategy</option>
-                    <option value="Concept Development">Concept Development</option>
-                    <option value="Design of Kitchens/Food Production Facilities">Design of Kitchens/Food Production
-                        Facilities</option>
-                    <option value="Dietary">Dietary</option>
-                    <option value="Distribution & Procurement">Distribution & Procurement</option>
-                    <option value="Energy & Environment">Energy & Environment</option>
-                    <option value="Finance Raising/Corporate Finance">Finance Raising/Corporate Finance</option>
-                    <option value="Food Safety & Hygiene">Food Safety & Hygiene</option>
-                    <option value="Franchising">Franchising</option>
-                    <option value="Human Resources">Human Resources</option>
-                    <option value="Interior Design">Interior Design</option>
-                    <option value="IT Systems">IT Systems</option>
-                    <option value="Laundry Design">Laundry Design</option>
-                    <option value="Legal Advice & Litigation Support">Legal Advice & Litigation Support</option>
-                    <option value="Management">Management</option>
-                    <option value="Recruitment & Development">Recruitment & Development</option>
-                    <option value="Market & Financial Feasibility Studies">Market & Financial Feasibility Studies
-                    </option>
-                    <option value="Marketing & Promotion">Marketing & Promotion</option>
-                    <option value="Menu & Recipe Development">Menu & Recipe Development</option>
-                    <option value="Operating Procedures & Systems">Operating Procedures & Systems</option>
-                    <option value="Operations Review & Re-Engineering">Operations Review & Re-Engineering</option>
-                    <option value="Operator RFPs">Operator RFPs</option>
-                    <option value="Appointment & Monitoring">Appointment & Monitoring</option>
-                    <option value="Quality Management">Quality Management</option>
-                    <option value="Training">Training</option>
-                    <option value="Other">Other</option>
+                    <?php
+                    // Get custom consulting services
+                    $consulting_services = get_option('sas_consulting_services', [
+                        'Accounting & Controls',
+                        'Architectural Design', 
+                        'Business Strategy',
+                        'Concept Development',
+                        'Design of Kitchens/Food Production Facilities',
+                        'Dietary',
+                        'Distribution & Procurement',
+                        'Energy & Environment',
+                        'Finance Raising/Corporate Finance',
+                        'Food Safety & Hygiene',
+                        'Franchising',
+                        'Human Resources',
+                        'Interior Design',
+                        'IT Systems',
+                        'Laundry Design',
+                        'Legal Advice & Litigation Support',
+                        'Management',
+                        'Recruitment & Development',
+                        'Market & Financial Feasibility Studies',
+                        'Marketing & Promotion',
+                        'Menu & Recipe Development',
+                        'Operating Procedures & Systems',
+                        'Operations Review & Re-Engineering',
+                        'Operator RFPs',
+                        'Appointment & Monitoring',
+                        'Quality Management',
+                        'Training',
+                        'Other'
+                    ]);
+                    
+                    if (!empty($consulting_services)) {
+                        foreach ($consulting_services as $service) {
+                            if (!empty(trim($service))) {
+                                echo '<option value="' . esc_attr($service) . '">' . esc_html($service) . '</option>' . "\n";
+                            }
+                        }
+                    } else {
+                        echo '<option value="Other">Other</option>' . "\n";
+                    }
+                    ?>
                 </select>
                 <div id="customSelectDisplay"
                     class="select2-container select2-container--default select2-container--below select2-container--focus select2-container--open select2-container--above select2-container--active select2-container--enabled select2-container--open select2-container--below">

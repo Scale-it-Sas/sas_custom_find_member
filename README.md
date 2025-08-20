@@ -39,29 +39,80 @@ A custom feature allows you to search post types using custom fields and categor
 
 ## Usage
 
-**Basic Usage:**
+### Initial Setup
 
 1. Install **CPT UI** and **ACF plugins**.
+2. Create a Custom post type with slug **'members'**
+3. Activate the SAS Find Member plugin.
 
-2. Create a Custom post type make sure the slug is **'members'**
+### Plugin Settings
 
-Once activated, the plugin provides a shortcode. You can find the shortcode below or go to **Dashboard > SAS Find Member**
+Navigate to **Dashboard > SAS Find Member** to configure:
 
-### Shortcode
+#### ACF Field Mapping Tab
+- **Enable/disable** ACF fields for search and display
+- **Customize labels** for field display names
+- **Set searchability** - make fields searchable in frontend
+- **Choose position** - display fields in left or right column
+- **Configure visibility** - show/hide fields in search results
 
-You can embed a custom search form anywhere on your posts, pages, or custom post types using the `[display_find_member_form]` shortcode.
+#### Consulting Services Management Tab
+- **Add new services** using the input field and "Add Service" button
+- **Edit existing services** by modifying text directly in the list
+- **Remove services** using the red "Remove" button
+- **Manage dropdown options** that appear in the search form
 
-Paste this on your pages, posts or custom post types.
+### Shortcode Usage
+
+Embed the search form using: `[display_find_member_form]`
+
+**Where to use:**
+- Pages, posts, or custom post types
+- Copy shortcode from settings page for convenience
+
+### Search Features
+
+**Frontend users can search by:**
+- Company name, first name, surname (default fields)
+- Any ACF fields marked as "searchable" in settings
+- Consulting services (categories) via multi-select dropdown
+- Partial text matching (e.g., "John" finds "Johnson")
+
+**Search behavior:**
+- Empty search shows all members
+- Multiple criteria use AND logic (all must match)
+- Results display configured fields in chosen positions
 
 ---
 
 ## Features
 
-- Search any Members post type.
-- Filter search results by custom field values (supports text, number, and select fields).
-- Refine searches by existing WordPress categories.
-- Easy integration via a user-friendly shortcode.
-- Lightweight and optimized for performance.
+### Core Functionality
+- **Dynamic search** across Members post type
+- **ACF field integration** with configurable search and display
+- **Custom consulting services** management (independent from categories)
+- **Multi-field search** with partial text matching
+- **Responsive design** with mobile-friendly interface
+
+### Admin Features
+- **Tabbed settings interface** for easy navigation
+- **Real-time ACF field detection** and configuration
+- **Visual field mapping** with drag-and-drop positioning
+- **Service management** with add/edit/remove capabilities
+- **Settings persistence** with automatic saving
+
+### Search Capabilities
+- **Flexible field searching** - any ACF field can be made searchable
+- **Multiple value support** - handles repeater fields and arrays
+- **Smart filtering** - combines multiple search criteria intelligently
+- **Clean results display** - customizable field positioning and labels
+- **Performance optimized** - efficient database queries
+
+### User Experience
+- **No-code configuration** - admin-friendly settings interface
+- **Instant feedback** - real-time form validation and responses
+- **Accessible design** - keyboard navigation and screen reader support
+- **Clean URLs** - SEO-friendly search functionality
 
 ---
 
@@ -101,21 +152,38 @@ To contribute to this plugin, follow these steps:
 
 ## Changelog
 
+**2.0.0 - 2025-08-20**
+
+**🎯 Major Release - Dynamic Field Management System**
+
+- **NEW:** Tabbed admin interface with ACF Field Mapping and Consulting Services Management
+- **NEW:** Dynamic ACF field detection and configuration system
+- **NEW:** Custom consulting services management (independent from WordPress categories)
+- **NEW:** Real-time field mapping with searchable/display toggles and positioning controls
+- **NEW:** Multi-value field support (repeater fields, arrays) for search and display
+- **ENHANCED:** Improved search logic with proper AND/OR handling for multiple criteria
+- **ENHANCED:** Better frontend form with dynamic field generation based on admin settings
+- **ENHANCED:** Professional WordPress-style admin interface with persistent tab states
+- **FIXED:** Resolved consulting services dropdown display issues (no more merged text)
+- **FIXED:** Proper search functionality for individual field criteria
+- **IMPROVED:** Database efficiency using WordPress options API (no custom tables)
+- **IMPROVED:** Category filtering - hidden "Uncategorized" and unused services from results
+
 **1.0.2 - 2025-08-19**
 
 - Modified search functionality to display all members when no search criteria are selected
 - Removed validation requirement for at least one search criterion
 - Improved user experience by allowing empty searches to show complete member directory
 
-**1.0.0 - 2025-07-18**
+**1.0.1 - 2025-07-18**
 
 - Added additional info in plugin
 
 **1.0.0 - 2025-07-17**
 
 - Initial Release
-- Introduced custom field and category search functionality.
-- Added `[display_find_member_form]` shortcode and Custom Search Widget.
+- Introduced custom field and category search functionality
+- Added `[display_find_member_form]` shortcode and Custom Search Widget
 
 
 ---

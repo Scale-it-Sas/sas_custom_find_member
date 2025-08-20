@@ -7,6 +7,7 @@ jQuery(document).ready(function($) {
 
     let selectedValues = new Set();
     const optionsData = [];
+    
     $selectElement.find('option').each(function() {
         optionsData.push({
             value: $(this).val(),
@@ -56,7 +57,12 @@ jQuery(document).ready(function($) {
         if (filteredOptions.length === 0) {
             const $noResults = $('<div>')
                 .text('No results found')
-                .addClass('text-gray-500 italic');
+                .addClass('text-gray-500 italic')
+                .css({
+                    'padding': '0.5rem 0.75rem',
+                    'font-style': 'italic',
+                    'color': '#6b7280'
+                });
             $customDropdownList.append($noResults);
             return;
         }
@@ -65,7 +71,15 @@ jQuery(document).ready(function($) {
             const $div = $('<div>')
                 .text(option.text)
                 .attr('data-value', option.value)
-                .addClass(selectedValues.has(option.value) ? 'selected' : '');
+                .addClass(selectedValues.has(option.value) ? 'selected' : '')
+                .css({
+                    'padding': '0.5rem 0.75rem',
+                    'cursor': 'pointer',
+                    'fontSize': '0.875rem',
+                    'borderBottom': '1px solid #f3f4f6',
+                    'backgroundColor': selectedValues.has(option.value) ? '#3b82f6' : '#fff',
+                    'color': selectedValues.has(option.value) ? 'white' : '#374151'
+                });
 
             $div.on('click', (e) => {
                 e.stopPropagation();
@@ -78,6 +92,19 @@ jQuery(document).ready(function($) {
                 renderDropdownList($searchInputField.val());
                 $searchInputField.focus();
             });
+
+            $div.on('mouseenter', function() {
+                if (!selectedValues.has(option.value)) {
+                    $(this).css('backgroundColor', '#f3f4f6');
+                }
+            });
+
+            $div.on('mouseleave', function() {
+                if (!selectedValues.has(option.value)) {
+                    $(this).css('backgroundColor', '#fff');
+                }
+            });
+
             $customDropdownList.append($div);
         });
     };
@@ -188,7 +215,18 @@ jQuery(document).ready(function($) {
         keyword.first_name = String($('#firstName').val() || '').trim();
         keyword.surname = String($('#surname').val() || '').trim();
 
-        console.log($('#firstName').val())
+        // Collect dynamic ACF field values
+        $('#sas-search-form input[type="text"]').each(function() {
+            const fieldName = $(this).attr('name');
+            const fieldValue = String($(this).val() || '').trim();
+            
+            // Skip if it's one of the default fields we already handled
+            if (fieldName && fieldName !== 'companyName' && fieldName !== 'firstName' && fieldName !== 'surname' && fieldValue) {
+                keyword[fieldName] = fieldValue;
+            }
+        });
+
+        console.log('All search keywords:', keyword);
 
         const services = $('#consultingServices').val();
         if (Array.isArray(services) && services.length > 0) {

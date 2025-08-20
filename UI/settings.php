@@ -215,9 +215,30 @@ $consulting_services = get_option('sas_consulting_services', [
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($acf_fields as $field_name => $field_label): 
+                        <?php 
+                        // Default fields that should be enabled by default
+                        $default_fields = ['company', 'firstname', 'surname'];
+                        
+                        foreach ($acf_fields as $field_name => $field_label): 
                             $mapping = $current_mappings[$field_name] ?? [];
-                            $enabled = !empty($mapping);
+                            
+                            // Check if this is a default field and no mapping exists yet
+                            $is_default_field = in_array($field_name, $default_fields);
+                            
+                            // Enable default fields by default, or use existing mapping
+                            if ($is_default_field && (empty($current_mappings) || !isset($current_mappings[$field_name]))) {
+                                $enabled = true;
+                                $show_in_results = true;
+                                $searchable = true;
+                                $position = 'left';
+                                $label = $field_label;
+                            } else {
+                                $enabled = !empty($mapping);
+                                $show_in_results = $mapping['show_in_results'] ?? false;
+                                $searchable = $mapping['searchable'] ?? false;
+                                $position = $mapping['position'] ?? 'left';
+                                $label = $mapping['label'] ?? $field_label;
+                            }
                         ?>
                         <tr>
                             <td>
@@ -233,27 +254,27 @@ $consulting_services = get_option('sas_consulting_services', [
                             <td>
                                 <input type="text" 
                                        name="acf_fields[<?php echo esc_attr($field_name); ?>][label]" 
-                                       value="<?php echo esc_attr($mapping['label'] ?? $field_label); ?>"
+                                       value="<?php echo esc_attr($label); ?>"
                                        <?php echo !$enabled ? 'disabled' : ''; ?>>
                             </td>
                             <td>
                                 <input type="checkbox" 
                                        name="acf_fields[<?php echo esc_attr($field_name); ?>][show_in_results]" 
                                        value="1" 
-                                       <?php checked($mapping['show_in_results'] ?? false); ?>
+                                       <?php checked($show_in_results); ?>
                                        <?php echo !$enabled ? 'disabled' : ''; ?>>
                             </td>
                             <td>
                                 <input type="checkbox" 
                                        name="acf_fields[<?php echo esc_attr($field_name); ?>][searchable]" 
                                        value="1" 
-                                       <?php checked($mapping['searchable'] ?? false); ?>
+                                       <?php checked($searchable); ?>
                                        <?php echo !$enabled ? 'disabled' : ''; ?>>
                             </td>
                             <td>
                                 <select name="acf_fields[<?php echo esc_attr($field_name); ?>][position]" <?php echo !$enabled ? 'disabled' : ''; ?>>
-                                    <option value="left" <?php selected($mapping['position'] ?? 'left', 'left'); ?>>Left Column</option>
-                                    <option value="right" <?php selected($mapping['position'] ?? 'left', 'right'); ?>>Right Column</option>
+                                    <option value="left" <?php selected($position, 'left'); ?>>Left Column</option>
+                                    <option value="right" <?php selected($position, 'right'); ?>>Right Column</option>
                                 </select>
                             </td>
                         </tr>
